@@ -159,14 +159,12 @@
     active = active || sortedIds().map((id) => byId.get(id)).filter((it) => !has(state.archived, it.id));
     const total = active.length;
     const done = active.filter((it) => isWatched(it.id)).length;
-    $("sTotal").textContent = total;
-    $("sWatched").textContent = done;
     $("hWatched").textContent = done;
     $("hLeft").textContent = total - done;
-    $("sArch").textContent = state.archived.filter((id) => byId.has(id)).length;
     $("sEss").textContent = active.filter((it) => it.tier === "ess" && !isWatched(it.id)).length;
     const pct = total ? done / total : 0;
-    $("slotFill").style.transform = `scaleX(${pct})`;
+    $("barFill").style.transform = `scaleX(${pct})`;
+    $("bar").setAttribute("aria-valuenow", String(Math.round(pct * 100)));
   }
 
   function toggleWatched(id, li) {
@@ -274,20 +272,4 @@
 
   render();
 
-  // entrance: hero lines rise, sections reveal their parts in turn
-  const root = document.documentElement;
-  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add("ready")));
-  const targets = [...document.querySelectorAll(".reveal")];
-  if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        const sib = [...e.target.parentElement.children].filter((c) => c.classList.contains("reveal"));
-        e.target.style.setProperty("--d", sib.indexOf(e.target) * 80 + "ms");
-        e.target.classList.add("in");
-        io.unobserve(e.target);
-      });
-    }, { threshold: 0.15 });
-    targets.forEach((t) => io.observe(t));
-  } else targets.forEach((t) => t.classList.add("in"));
 })();

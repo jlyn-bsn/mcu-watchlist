@@ -7,112 +7,68 @@
 <meta name="description" content="Every MCU film and series in release order. Tick what you have watched, archive what you will skip, drag to make your own order.">
 <meta property="og:title" content="MCU Watchlist">
 <meta property="og:description" content="Every MCU film and series in release order. Tick, archive, drag.">
-<meta name="theme-color" content="#9c1220">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%239c1220%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-family=%27Arial,sans-serif%27 font-weight=%27700%27 font-size=%2720%27 text-anchor=%27middle%27 fill=%27white%27%3EM%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#0b0b12">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%23e62429%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-family=%27Arial,sans-serif%27 font-weight=%27700%27 font-size=%2720%27 text-anchor=%27middle%27 fill=%27white%27%3EM%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<script>document.documentElement.classList.add("js");</script>
 </head>
 <body id="top">
 <a class="skip" href="#list">Skip to list</a>
 
-<header class="hero">
-  <nav class="bar-top" aria-label="Site">
-    <span class="wordmark">MCU Watchlist</span>
-    <a class="bar-link" href="#list">Go to the list</a>
-  </nav>
-
-  <h1 class="sentence" id="sentence">
-    <span class="line"><span class="line-in"><b id="hWatched">0</b> watched<span class="slot" aria-hidden="true"><i id="slotFill"></i></span></span></span>
-    <span class="line"><span class="line-in"><b id="hLeft">70</b> to go.</span></span>
-  </h1>
-
-  <div class="hero-foot">
-    <p class="support">Every MCU film and series in order. Tick, archive, drag.</p>
-    <a class="btn-main" href="#list">Start watching</a>
-  </div>
-</header>
-
-<figure class="band reveal">
-  <img src="assets/movie-theater-seats-unsplash.jpg" width="1920" height="1280" alt="Rows of empty black seats in a dark cinema">
-</figure>
-
-<main>
-  <section class="figures" aria-labelledby="figHead">
-    <h2 id="figHead" class="statement reveal"><span>Where you</span> <span>stand today</span></h2>
-    <dl class="ledger">
-      <div class="reveal"><dt>Titles in your list</dt><dd id="sTotal">0</dd></div>
-      <div class="reveal"><dt>Watched so far</dt><dd id="sWatched">0</dd></div>
-      <div class="reveal"><dt>Essential still to watch</dt><dd id="sEss">0</dd></div>
-      <div class="reveal"><dt>Archived and out of the way</dt><dd id="sArch">0</dd></div>
-    </dl>
-  </section>
-
-  <section class="listing" id="listing" aria-labelledby="listHead">
-    <div class="wrap">
-      <h2 id="listHead" class="statement reveal"><span>Your watch</span> <span>order</span></h2>
-
-      <div class="controls reveal">
-        <div class="pills" role="group" aria-label="Type">
-          <button class="pill active" aria-pressed="true" data-type="all">All</button>
-          <button class="pill" aria-pressed="false" data-type="unwatched">Unwatched</button>
-          <button class="pill" aria-pressed="false" data-type="film">Films</button>
-          <button class="pill" aria-pressed="false" data-type="tv">TV</button>
-        </div>
-        <div class="row2">
-          <select id="sort" aria-label="Sort order">
-            <option value="release">Release Order</option>
-            <option value="mine">My Order</option>
-          </select>
-          <input id="search" type="search" placeholder="Search..." aria-label="Search titles">
-          <button class="reset-btn" id="resetOrder" type="button" hidden>Reset order</button>
-        </div>
-        <div class="legend">
-          <span><b class="dot movie"></b>Movie</span>
-          <span><b class="dot tv"></b>TV</span>
-          <span><b class="dot special"></b>Special</span>
-          <span><b class="dot milestone"></b>Milestone</span>
-          <span class="chip ess">Essential</span>
-          <span class="chip rec">Recommended</span>
-          <span class="chip opt">Optional</span>
-        </div>
-        <p class="hint">Essential means the main story runs through it. Recommended adds context or payoff worth having. Optional means you can skip it and still follow along. Tags like Fox, Sony SSU and Netflix mark titles from outside Marvel Studios.</p>
-      </div>
-
-      <div id="list" tabindex="-1"></div>
-      <p id="live" class="sr-only" role="status" aria-live="polite"></p>
-      <p id="empty" class="empty" hidden></p>
-
-      <section class="archive">
-        <button id="archiveToggle" class="archive-toggle" aria-expanded="false">Archived (<span id="archiveCount">0</span>)</button>
-        <ol id="archiveList" class="rows" hidden></ol>
-      </section>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <span class="logo-box" aria-hidden="true">MCU</span>
+      <h1>Watchlist</h1>
     </div>
-  </section>
-</main>
+    <p class="tally" aria-live="polite"><b id="hWatched">0</b> watched <span class="sep" aria-hidden="true"></span> <b id="hLeft">70</b> to go <span class="sep" aria-hidden="true"></span> <b id="sEss">0</b> essential left</p>
+  </header>
+  <div class="progress" role="progressbar" aria-label="Watched" aria-valuemin="0" aria-valuemax="100" id="bar"><i id="barFill"></i></div>
 
-<div class="strip">
-  <figure class="reveal"><img src="assets/film-reel-on-an-imax-15-70.jpg" width="1920" height="1440" loading="lazy" alt="A large film reel on a projector platter in a dim projection room"></figure>
-  <figure class="reveal"><img src="assets/vintage-projector-reel.webp" width="1024" height="683" loading="lazy" alt="A vintage film projector with a reel of film"></figure>
-  <figure class="reveal"><img src="assets/1968-living-room-with-telefunken-opus-studio.jpg" width="1920" height="1280" loading="lazy" alt="A 1968 living room with a television on a long wooden cabinet and a woman reading"></figure>
+  <main>
+    <section class="controls" aria-label="Filters">
+      <div class="pills" role="group" aria-label="Type">
+        <button class="pill active" aria-pressed="true" data-type="all">All</button>
+        <button class="pill" aria-pressed="false" data-type="unwatched">Unwatched</button>
+        <button class="pill" aria-pressed="false" data-type="film">Films</button>
+        <button class="pill" aria-pressed="false" data-type="tv">TV</button>
+      </div>
+      <div class="row2">
+        <select id="sort" aria-label="Sort order">
+          <option value="release">Release Order</option>
+          <option value="mine">My Order</option>
+        </select>
+        <input id="search" type="search" placeholder="Search..." aria-label="Search titles">
+        <button class="reset-btn" id="resetOrder" type="button" hidden>Reset order</button>
+      </div>
+      <div class="legend">
+        <span><b class="dot movie"></b>Movie</span>
+        <span><b class="dot tv"></b>TV</span>
+        <span><b class="dot special"></b>Special</span>
+        <span><b class="dot milestone"></b>Milestone</span>
+        <span class="chip ess">Essential</span>
+        <span class="chip rec">Recommended</span>
+        <span class="chip opt">Optional</span>
+      </div>
+      <p class="hint">Essential means the main story runs through it. Recommended adds context or payoff worth having. Optional means you can skip it and still follow along. Tags like Fox, Sony SSU and Netflix mark titles from outside Marvel Studios.</p>
+    </section>
+
+    <div id="list" tabindex="-1"></div>
+    <p id="live" class="sr-only" role="status" aria-live="polite"></p>
+    <p id="empty" class="empty" hidden></p>
+
+    <section class="archive">
+      <button id="archiveToggle" class="archive-toggle" aria-expanded="false">Archived (<span id="archiveCount">0</span>)</button>
+      <ol id="archiveList" class="rows" hidden></ol>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>A fan-made tracker. Not affiliated with Marvel or Disney. Dates are US release dates, or premiere dates for series. Your progress stays in this browser.</p>
+  </footer>
 </div>
-
-<footer class="foot">
-  <div class="foot-top">
-    <p>A fan-made tracker. Not affiliated with Marvel or Disney.</p>
-    <p>Dates are US release dates, or premiere dates for series.</p>
-    <a class="foot-up" href="#top">Back to the top</a>
-  </div>
-  <a class="foot-line" href="#list">Back to<br>the list.</a>
-  <p class="credits">Pictures: <a href="https://commons.wikimedia.org/w/index.php?curid=62124971">“Movie theater seats (Unsplash)”</a> by Elijah Flores baesik, <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.en/">CC0</a>; <a href="https://commons.wikimedia.org/w/index.php?curid=123422467">“Film Reel on an IMAX 15 70 mm Film Projector”</a> by DiscoA340, <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.en/">CC0</a>; <a href="https://www.rawpixel.com/image/3297074/free-photo-image-cinema-movie-projector">“Vintage projector reel”</a>, <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>, via rawpixel; <a href="https://commons.wikimedia.org/wiki/File:1968_living_room_with_Telefunken_Opus_Studio_and_Philco_Predicta_Siesta_(1959).jpg">“1968 living room with Telefunken Opus Studio and Philco Predicta Siesta (1959)”</a> by Yolanda, <a href="https://creativecommons.org/licenses/by/2.0">CC BY 2.0</a>. Via Wikimedia Commons unless noted.</p>
-  <div class="foot-meta">
-    <span>Your progress stays in this browser</span>
-    <span>Made for watching in order</span>
-    <span>2026</span>
-  </div>
-</footer>
 
 <dialog id="confirm" aria-labelledby="confirmTitle">
   <form method="dialog">
