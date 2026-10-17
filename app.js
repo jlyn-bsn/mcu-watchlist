@@ -232,44 +232,41 @@
     const ol = li.parentElement;
     const grab = e.clientY - li.getBoundingClientRect().top;
     let y = e.clientY, raf = 0, moved = false;
-    grip.setPointerCapture(e.pointerId);
+    try { grip.setPointerCapture(e.pointerId); } catch { /* synthetic or already released */ }
     li.classList.add("dragging");
     document.body.classList.add("drag-active");
     li.style.transition = "none";
     const startNext = li.nextElementSibling;
 
+    // All maths uses layout offsets (offsetTop), which ignore transforms, so the row's own
+    // transform and neighbours' slide animations can never feed back into the swap decision.
     function place() {
-      li.style.transform = "";
-      const natural = li.getBoundingClientRect().top;
-      let top = y - grab;
-      li.style.transform = `translateY(${top - natural}px) scale(1.01)`;
-      // swap past a neighbour once the dragged row's centre crosses its midpoint
-      const centre = top + li.offsetHeight / 2;
-      for (;;) {
+      if (!li.isConnected) return finish(false);
+      const base = (li.offsetParent || document.documentElement).getBoundingClientRect().top;
+      const top = Math.min(Math.max(y, 0), innerHeight) - grab - base; // finger may leave the screen
+      const centre = () => top + li.offsetHeight / 2;
+      for (let guard = 0; guard < 400; guard++) {
         const next = li.nextElementSibling, prev = li.previousElementSibling;
-        const nr = next && next.getBoundingClientRect(), pr = prev && prev.getBoundingClientRect();
-        if (next && centre > nr.top + nr.height / 2) swap(next, true);
-        else if (prev && centre < pr.top + pr.height / 2) swap(prev, false);
+        if (next && centre() > next.offsetTop + next.offsetHeight / 2) swap(next, true);
+        else if (prev && centre() < prev.offsetTop + prev.offsetHeight / 2) swap(prev, false);
         else break;
-        li.style.transform = "";
-        const n2 = li.getBoundingClientRect().top;
-        li.style.transform = `translateY(${top - n2}px) scale(1.01)`;
       }
+      li.style.transform = `translateY(${top - li.offsetTop}px) scale(1.01)`;
     }
     function swap(sib, after) {
-      const before = sib.getBoundingClientRect().top;
+      const before = sib.offsetTop;
       // move the neighbour, never the dragged row: re-parenting the grip would drop pointer capture
       ol.insertBefore(sib, after ? li : li.nextSibling);
       moved = true;
       if (reduceMotion()) return;
-      const d = before - sib.getBoundingClientRect().top;
+      const d = before - sib.offsetTop;
       if (d) sib.animate([{ transform: `translateY(${d}px)` }, { transform: "none" }], { duration: 160, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
     }
     function tick() {
-      const edge = 70, vh = innerHeight;
+      const edge = 70, vh = innerHeight, cy = Math.min(Math.max(y, 0), vh);
       let v = 0;
-      if (y < edge) v = -Math.ceil((edge - y) / 5);
-      else if (y > vh - edge) v = Math.ceil((y - (vh - edge)) / 5);
+      if (cy < edge) v = -Math.ceil((edge - cy) / 5);
+      else if (cy > vh - edge) v = Math.ceil((cy - (vh - edge)) / 5);
       if (v) { scrollBy({ top: v, behavior: "instant" }); place(); }
       raf = requestAnimationFrame(tick);
     }
@@ -277,11 +274,14 @@
       if (ev.pointerType === "mouse" && ev.buttons === 0) return finish(true); // release was missed
       y = ev.clientY; place();
     }
+    const noMenu = (ev) => ev.preventDefault();
     let over = false;
     function finish(commit) {
       if (over) return;
       over = true;
       cancelAnimationFrame(raf);
+      removeEventListener("blur", stop);
+      grip.removeEventListener("contextmenu", noMenu);
       grip.removeEventListener("pointermove", onMove);
       grip.removeEventListener("pointerup", onUp);
       grip.removeEventListener("pointercancel", onCancel);
@@ -308,6 +308,9 @@
     }
     function onUp() { finish(true); }
     function onCancel() { finish(false); }
+    const stop = () => finish(true);
+    addEventListener("blur", stop);
+    grip.addEventListener("contextmenu", noMenu);
     grip.addEventListener("pointermove", onMove);
     grip.addEventListener("pointerup", onUp);
     grip.addEventListener("pointercancel", onCancel);
