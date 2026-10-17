@@ -116,10 +116,8 @@ input[type=search] { flex: 1; min-width: 180px; }
 .item.enter { animation: row-in 360ms var(--ease-out) backwards; }
 @keyframes row-in { from { opacity: 0; transform: translateY(12px); } }
 .item.leaving { opacity: 0; transform: scale(.97); }
-.item.dragging { opacity: .4; }
-.item.over-top::before, .item.over-bottom::before { content: ""; position: absolute; left: 0; right: 0; height: 3px; border-radius: 2px; background: var(--red); }
-.item.over-top::before { top: -6px; }
-.item.over-bottom::before { bottom: -6px; }
+.item.dragging { z-index: 3; background: var(--panel-2); box-shadow: 0 10px 30px rgba(0, 0, 0, .55); cursor: grabbing; will-change: transform; }
+body.drag-active { cursor: grabbing; user-select: none; -webkit-user-select: none; }
 
 .grip { background: none; border: 0; border-radius: 6px; font-family: inherit; cursor: grab; color: #7c7c96; font-size: var(--step-lead); letter-spacing: -3px; user-select: none; padding: 4px 2px; touch-action: none; }
 .grip:active { cursor: grabbing; }

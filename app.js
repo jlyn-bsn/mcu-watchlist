@@ -91,7 +91,6 @@
         e.preventDefault();
         nudge(it.id, e.key === "ArrowUp" ? -1 : 1);
       });
-      li.draggable = true;
     } else { grip.setAttribute("aria-hidden", "true"); grip.style.visibility = "hidden"; }
 
     const tile = el("span", "tile", TILE[it.cat]);
@@ -218,38 +217,102 @@
     const pos = [...listEl.querySelectorAll(".item")].findIndex((r) => r.dataset.id === id) + 1;
     $("live").textContent = byId.get(id).title + ", position " + pos + " of " + visible.length;
   }
-  let dragId = null;
+  // Pointer-driven drag: the row follows the pointer, neighbours slide out of the way live,
+  // and the order is committed once on release.
+  const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
   function wireDrag(li, id) {
-    li.addEventListener("dragstart", (e) => {
-      dragId = id;
-      li.classList.add("dragging");
-      e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("text/plain", id);
-    });
-    li.addEventListener("dragend", () => { dragId = null; clearOver(); li.classList.remove("dragging"); });
-    li.addEventListener("dragover", (e) => {
-      if (!dragId || dragId === id) return;
+    const grip = li.querySelector(".grip");
+    grip.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0 && e.pointerType === "mouse") return;
       e.preventDefault();
-      const r = li.getBoundingClientRect();
-      const top = e.clientY < r.top + r.height / 2;
-      clearOver();
-      li.classList.add(top ? "over-top" : "over-bottom");
-    });
-    li.addEventListener("dragleave", () => li.classList.remove("over-top", "over-bottom"));
-    li.addEventListener("drop", (e) => {
-      e.preventDefault();
-      if (!dragId || dragId === id) return;
-      const r = li.getBoundingClientRect();
-      const before = e.clientY < r.top + r.height / 2;
-      const order = fullOrder().filter((x) => x !== dragId);
-      const at = order.indexOf(id);
-      order.splice(before ? at : at + 1, 0, dragId);
-      dragId = null;
-      commitOrder(order);
+      startDrag(li, id, e, grip);
     });
   }
-  function clearOver() {
-    listEl.querySelectorAll(".over-top,.over-bottom").forEach((n) => n.classList.remove("over-top", "over-bottom"));
+  function startDrag(li, id, e, grip) {
+    const ol = li.parentElement;
+    const grab = e.clientY - li.getBoundingClientRect().top;
+    let y = e.clientY, raf = 0, moved = false;
+    grip.setPointerCapture(e.pointerId);
+    li.classList.add("dragging");
+    document.body.classList.add("drag-active");
+    li.style.transition = "none";
+    const startNext = li.nextElementSibling;
+
+    function place() {
+      li.style.transform = "";
+      const natural = li.getBoundingClientRect().top;
+      let top = y - grab;
+      li.style.transform = `translateY(${top - natural}px) scale(1.01)`;
+      // swap past a neighbour once the dragged row's centre crosses its midpoint
+      const centre = top + li.offsetHeight / 2;
+      for (;;) {
+        const next = li.nextElementSibling, prev = li.previousElementSibling;
+        const nr = next && next.getBoundingClientRect(), pr = prev && prev.getBoundingClientRect();
+        if (next && centre > nr.top + nr.height / 2) swap(next, true);
+        else if (prev && centre < pr.top + pr.height / 2) swap(prev, false);
+        else break;
+        li.style.transform = "";
+        const n2 = li.getBoundingClientRect().top;
+        li.style.transform = `translateY(${top - n2}px) scale(1.01)`;
+      }
+    }
+    function swap(sib, after) {
+      const before = sib.getBoundingClientRect().top;
+      ol.insertBefore(li, after ? sib.nextSibling : sib);
+      moved = true;
+      if (reduceMotion()) return;
+      const d = before - sib.getBoundingClientRect().top;
+      if (d) sib.animate([{ transform: `translateY(${d}px)` }, { transform: "none" }], { duration: 160, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
+    }
+    function tick() {
+      const edge = 70, vh = innerHeight;
+      let v = 0;
+      if (y < edge) v = -Math.ceil((edge - y) / 5);
+      else if (y > vh - edge) v = Math.ceil((y - (vh - edge)) / 5);
+      if (v) { scrollBy({ top: v, behavior: "instant" }); place(); }
+      raf = requestAnimationFrame(tick);
+    }
+    function onMove(ev) {
+      if (ev.pointerType === "mouse" && ev.buttons === 0) return finish(true); // release was missed
+      y = ev.clientY; place();
+    }
+    let over = false;
+    function finish(commit) {
+      if (over) return;
+      over = true;
+      cancelAnimationFrame(raf);
+      grip.removeEventListener("pointermove", onMove);
+      grip.removeEventListener("pointerup", onUp);
+      grip.removeEventListener("pointercancel", onCancel);
+      grip.removeEventListener("lostpointercapture", onUp);
+      document.body.classList.remove("drag-active");
+      const done = () => {
+        li.classList.remove("dragging");
+        li.style.transform = li.style.transition = "";
+        if (commit && moved) {
+          const next = li.nextElementSibling, prev = li.previousElementSibling;
+          const order = fullOrder().filter((x) => x !== id);
+          if (next) order.splice(order.indexOf(next.dataset.id), 0, id);
+          else if (prev) order.splice(order.indexOf(prev.dataset.id) + 1, 0, id);
+          commitOrder(order);
+        } else if (!commit && moved) {
+          ol.insertBefore(li, startNext);
+        }
+      };
+      // settle into the slot, then commit
+      if (reduceMotion()) return done();
+      li.style.transition = "transform 160ms cubic-bezier(0.23, 1, 0.32, 1)";
+      li.style.transform = "none";
+      setTimeout(done, 170);
+    }
+    function onUp() { finish(true); }
+    function onCancel() { finish(false); }
+    grip.addEventListener("pointermove", onMove);
+    grip.addEventListener("pointerup", onUp);
+    grip.addEventListener("pointercancel", onCancel);
+    grip.addEventListener("lostpointercapture", onUp);
+    raf = requestAnimationFrame(tick);
+    place();
   }
 
   // ---- jump to next unwatched ----
