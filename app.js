@@ -267,9 +267,25 @@
     if (dlg.returnValue === "ok") { state.order = []; save(); render(); }
     dlg.returnValue = "";
   });
-  // click on the backdrop cancels
-  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close("cancel"); });
+  // reset watch progress (separate, confirmed)
+  const pdlg = $("confirmProgress");
+  $("resetProgress").addEventListener("click", () => pdlg.showModal());
+  pdlg.addEventListener("close", () => {
+    if (pdlg.returnValue === "ok") { state.watched = []; save(); render(); }
+    pdlg.returnValue = "";
+  });
+  // click on a backdrop cancels
+  [dlg, pdlg].forEach((d) => d.addEventListener("click", (e) => { if (e.target === d) d.close("cancel"); }));
+
+  // progress lives in this browser (no account). Ask the browser not to evict it,
+  // and keep other open tabs of the site in sync.
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch { /* optional */ }
+  window.addEventListener("storage", (e) => {
+    if (e.key !== KEY) return;
+    state = load();
+    if (state.sort !== "mine") state.sort = "release";
+    render();
+  });
 
   render();
-
 })();

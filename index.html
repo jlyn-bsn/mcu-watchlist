@@ -66,7 +66,8 @@
   </main>
 
   <footer class="foot">
-    <p>A fan-made tracker. Not affiliated with Marvel or Disney. Dates are US release dates, or premiere dates for series. Your progress stays in this browser.</p>
+    <p>A fan-made tracker. Not affiliated with Marvel or Disney. Dates are US release dates, or premiere dates for series. Your progress is saved in this browser, so there is nothing to sign in to.</p>
+    <button class="link-btn" id="resetProgress" type="button">Reset watch progress</button>
   </footer>
 </div>
 
@@ -77,6 +78,16 @@
     <div class="dlg-actions">
       <button value="cancel" class="dlg-btn" autofocus>Cancel</button>
       <button value="ok" class="dlg-btn danger" id="confirmOk">Reset order</button>
+    </div>
+  </form>
+</dialog>
+<dialog id="confirmProgress" aria-labelledby="progressTitle">
+  <form method="dialog">
+    <h2 id="progressTitle">Reset watch progress?</h2>
+    <p>This marks every title as unwatched. Your archive and your custom order are kept. This cannot be undone.</p>
+    <div class="dlg-actions">
+      <button value="cancel" class="dlg-btn" autofocus>Cancel</button>
+      <button value="ok" class="dlg-btn danger">Reset progress</button>
     </div>
   </form>
 </dialog>
