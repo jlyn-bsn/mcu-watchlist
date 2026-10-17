@@ -25,10 +25,6 @@
   const TIER_LABEL = { ess: "Essential to the MCU", rec: "Recommended for the MCU", opt: "Optional to the MCU" };
   const TILE = { movie: "Film", tv: "TV", special: "Special", milestone: "Film" };
 
-  const ICON = {
-    check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
-    x: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'
-  };
 
   // custom order: stored ids still valid, then any new items in release order
   function fullOrder() {
@@ -66,10 +62,9 @@
     if (text != null) e.textContent = text;
     return e;
   }
-  function iconBtn(svg, label, cls, fn) {
-    const b = el("button", "icon-btn " + cls);
+  function actBtn(label, cls, fn) {
+    const b = el("button", "act-btn " + cls);
     b.type = "button";
-    b.innerHTML = svg;
     b.title = label;
     b.setAttribute("aria-label", label);
     b.addEventListener("click", fn);
@@ -103,9 +98,9 @@
 
     const act = el("div", "actions");
     if (!archived) {
-      const w = iconBtn(ICON.check, "Watched", "watch", () => toggleWatched(it.id, li));
+      const w = actBtn("Watched", "watch", () => toggleWatched(it.id, li));
       w.setAttribute("aria-pressed", String(isWatched(it.id)));
-      act.append(w, iconBtn(ICON.x, "Archive", "do-archive", () => setArchived(it.id, true, li)));
+      act.append(w, actBtn("Archive", "do-archive", () => setArchived(it.id, true, li)));
     } else {
       const r = el("button", "pill-btn", "Restore");
       r.type = "button";
@@ -166,11 +161,12 @@
     const done = active.filter((it) => isWatched(it.id)).length;
     $("sTotal").textContent = total;
     $("sWatched").textContent = done;
-    $("sLeft").textContent = total - done;
+    $("hWatched").textContent = done;
+    $("hLeft").textContent = total - done;
+    $("sArch").textContent = state.archived.filter((id) => byId.has(id)).length;
     $("sEss").textContent = active.filter((it) => it.tier === "ess" && !isWatched(it.id)).length;
     const pct = total ? done / total : 0;
-    $("barFill").style.transform = `scaleX(${pct})`;
-    $("bar").setAttribute("aria-valuenow", String(Math.round(pct * 100)));
+    $("slotFill").style.transform = `scaleX(${pct})`;
   }
 
   function toggleWatched(id, li) {
@@ -277,4 +273,21 @@
   dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close("cancel"); });
 
   render();
+
+  // entrance: hero lines rise, sections reveal their parts in turn
+  const root = document.documentElement;
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add("ready")));
+  const targets = [...document.querySelectorAll(".reveal")];
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const sib = [...e.target.parentElement.children].filter((c) => c.classList.contains("reveal"));
+        e.target.style.setProperty("--d", sib.indexOf(e.target) * 80 + "ms");
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.15 });
+    targets.forEach((t) => io.observe(t));
+  } else targets.forEach((t) => t.classList.add("in"));
 })();
