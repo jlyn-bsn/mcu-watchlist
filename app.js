@@ -22,7 +22,7 @@
   const has = (arr, id) => arr.includes(id);
   const isWatched = (id) => has(state.watched, id);
 
-  const TIER_LABEL = { ess: "Essential to the MCU", rec: "Recommended for the MCU", opt: "Optional to the MCU" };
+  const TIER_LABEL = { ess: "Essential", rec: "Recommended", opt: "Optional" };
   const TILE = { movie: "Film", tv: "TV", special: "Special", milestone: "Film" };
 
 

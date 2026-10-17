@@ -17,17 +17,20 @@
   --milestone: #ff5a62;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --margin: clamp(16px, 4vw, 32px);
-  /* type steps: 15 / 16 / 20 / 28 / display */
-  --step-small: 0.9375rem;
-  --step-body: 1rem;
-  --step-lead: 1.25rem;
-  --step-head: 1.75rem;
-  --step-display: clamp(2.5rem, 2rem + 2.5vw, 3.5rem);
+  /* fluid type steps: min at ~360px, max at desktop */
+  --step-small: clamp(0.8125rem, 0.76rem + 0.27vw, 0.9375rem);
+  --step-body: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
+  --step-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --step-head: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  --step-display: clamp(2rem, 1.5rem + 3vw, 3.5rem);
+  --step-logo: clamp(1.75rem, 1.4rem + 1.8vw, 2.5rem);
+  --step-num: clamp(1.5rem, 1.2rem + 1.5vw, 2.125rem);
   --display: "Bebas Neue", "Barlow Condensed", Impact, sans-serif;
   --text-font: "Barlow", system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+button, select { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
   margin: 0;
@@ -50,10 +53,10 @@ a { color: inherit; }
 /* ---------- header: straight into the list ---------- */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 12px; }
-.logo-box { background: var(--red); color: #fff; padding: 0 10px; height: 50px; line-height: 50px; font: 40px var(--display); letter-spacing: .02em; border-radius: 2px; }
+.logo-box { background: var(--red); color: #fff; padding: 0 .25em; height: 1.25em; line-height: 1.25em; font: var(--step-logo) var(--display); letter-spacing: .02em; border-radius: 2px; }
 h1 { font: var(--step-display)/1 var(--display); letter-spacing: .03em; text-transform: uppercase; color: #fff; }
 .tally { font-size: var(--step-body); color: var(--muted); display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
-.tally b { font: 34px/1 var(--display); letter-spacing: .03em; color: var(--gold); margin-right: 2px; }
+.tally b { font: var(--step-num)/1 var(--display); letter-spacing: .03em; color: var(--gold); margin-right: 2px; }
 .sep { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: var(--panel-3); align-self: center; }
 .progress { height: 6px; border-radius: 99px; background: var(--panel-2); margin-top: 16px; overflow: hidden; }
 .progress i { display: block; height: 100%; width: 100%; background: var(--red); transform-origin: left; transform: scaleX(0); transition: transform 400ms var(--ease-out); }
@@ -62,7 +65,7 @@ h1 { font: var(--step-display)/1 var(--display); letter-spacing: .03em; text-tra
 .controls { margin-top: 28px; }
 .pills { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .pill {
-  background: var(--panel); color: var(--text); border: 0; border-radius: 999px; padding: 10px 22px; min-height: 46px;
+  background: var(--panel); color: var(--text); border: 0; border-radius: 999px; padding: 10px clamp(14px, 4vw, 22px); min-height: 46px;
   font: 600 var(--step-body) var(--text-font); cursor: pointer;
   transition: background-color 160ms ease, color 160ms ease, transform 160ms var(--ease-out);
 }
@@ -73,7 +76,7 @@ h1 { font: var(--step-display)/1 var(--display); letter-spacing: .03em; text-tra
 .row2 { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
 select, input[type=search] {
   background: var(--panel); color: var(--text); border: 0; border-radius: 12px; min-height: 50px; padding: 0 16px;
-  font: 500 var(--step-body) var(--text-font);
+  font: 500 16px var(--text-font); /* 16px floor: smaller makes iOS zoom the page on focus */
 }
 input[type=search]::placeholder { color: var(--muted); }
 select {
@@ -104,7 +107,7 @@ input[type=search] { flex: 1; min-width: 180px; }
 .item {
   --c: var(--muted);
   position: relative;
-  display: grid; grid-template-columns: auto auto 1fr auto; gap: 14px; align-items: center;
+  display: grid; grid-template-columns: auto auto 1fr auto; column-gap: 14px; row-gap: 4px; align-items: center;
   background: var(--panel); border-radius: 12px; padding: 12px 14px;
   transition: background-color 220ms ease, opacity 180ms ease, transform 180ms var(--ease-out);
 }
@@ -125,8 +128,12 @@ input[type=search] { flex: 1; min-width: 180px; }
   font: 600 var(--step-small) var(--text-font);
   color: color-mix(in srgb, var(--c) 82%, white); background: color-mix(in srgb, var(--c) 15%, #101019);
 }
-.main { min-width: 0; }
-.title-row { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
+/* two rows: title + chips on top, date with the buttons beneath */
+.main { display: contents; }
+.grip, .tile { grid-row: 1 / span 2; }
+.title-row { grid-column: 3 / -1; grid-row: 1; min-width: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; }
+.meta { grid-column: 3; grid-row: 2; }
+.actions { grid-column: 4; grid-row: 2; }
 .title { font-weight: 700; font-size: var(--step-lead); line-height: 1.2; transition: color 220ms ease; }
 .chip { font-size: var(--step-small); font-weight: 600; border-radius: 6px; padding: 1px 9px; color: var(--muted); }
 .chip.ess { color: var(--gold); background: #35290a; }
@@ -188,13 +195,14 @@ dialog p { color: var(--muted); }
   .pill-btn { min-height: 46px; }
 }
 @media (max-width: 600px) {
-  .item { grid-template-columns: 1fr auto; row-gap: 6px; }
+  .item { grid-template-columns: 1fr auto; column-gap: 10px; }
   .grip { display: none; }
   .tile { display: none; }
   .title::before { content: ""; display: inline-block; width: .5em; height: .5em; border-radius: 50%; background: var(--c); margin-right: .45em; vertical-align: .08em; }
-  .main { grid-column: 1; }
-  .actions { grid-column: 2; grid-row: 1; align-self: start; }
-  .logo-box { font-size: 32px; height: 40px; line-height: 40px; }
+  .title-row { grid-column: 1 / -1; flex-wrap: nowrap; align-items: baseline; gap: 4px 8px; }
+  .title-row .chip { flex: none; }
+  .meta { grid-column: 1; }
+  .actions { grid-column: 2; }
 }
 @media (prefers-reduced-motion: reduce) {
   .item.enter { animation: none; }
