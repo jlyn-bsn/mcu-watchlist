@@ -208,3 +208,23 @@ dialog p { color: var(--muted); }
   .item.enter { animation: none; }
   .item, .progress i, .act-btn, .pill, .pill-btn { transition-property: background-color, color, opacity; }
 }
+
+/* ---------- floating jump button ---------- */
+.jump {
+  position: fixed; right: max(var(--margin), env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); z-index: 5;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 20px 0 16px;
+  background: var(--red); color: #fff; border: 0; border-radius: 999px; cursor: pointer;
+  font: 600 var(--step-body) var(--text-font); box-shadow: 0 6px 22px rgba(0, 0, 0, .55);
+  transition: background-color 160ms ease, transform 160ms var(--ease-out);
+}
+.jump:active { transform: scale(.96); background: var(--red-press); }
+@media (hover: hover) and (pointer: fine) { .jump:hover { background: var(--red-press); } }
+@media (max-width: 480px) { .jump span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } .jump { padding: 0; width: 52px; justify-content: center; } }
+.item.flash { animation: flash 1100ms ease-out; }
+@keyframes flash { 0%, 40% { box-shadow: 0 0 0 3px var(--gold); } 100% { box-shadow: 0 0 0 3px transparent; } }
+@media (prefers-reduced-motion: reduce) { .item.flash { animation: none; outline: 3px solid var(--gold); } }
+
+/* ---------- expanded marvel checkbox ---------- */
+.check { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; margin-top: 16px; cursor: pointer; min-height: 44px; font-weight: 600; }
+.check input { width: 22px; height: 22px; accent-color: var(--red); margin: 0; cursor: pointer; }
+.check small { flex-basis: 100%; padding-left: 34px; margin-top: -2px; color: var(--muted); font-size: var(--step-small); font-weight: 400; }

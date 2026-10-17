@@ -1,6 +1,6 @@
 (() => {
   const KEY = "mcu-watchlist-v1";
-  const defaults = { watched: [], archived: [], order: [], sort: "release" };
+  const defaults = { watched: [], archived: [], order: [], sort: "release", expanded: false };
   let state = load();
   if (state.sort !== "mine") state.sort = "release";
   let typeFilter = "all";
@@ -38,6 +38,10 @@
     if (state.sort === "mine") return fullOrder();
     return ITEMS.map((i) => i.id);
   }
+  // titles in play: not archived, and non-Marvel-Studios ones only when "Expanded Marvel" is ticked
+  function activeItems() {
+    return sortedIds().map((id) => byId.get(id)).filter((it) => !has(state.archived, it.id) && (state.expanded || !it.ext));
+  }
   function groupOf(it) {
     if (state.sort === "mine") return "My order";
     return "Release order";
@@ -51,9 +55,11 @@
     return true;
   }
 
-  function fmtDate(iso) {
-    const [y, m, d] = iso.split("-").map(Number);
-    return new Date(y, m - 1, d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  function fmtDate(d) {
+    const [y, m, day] = d.split("-").map(Number);
+    if (!m) return String(y);
+    if (!day) return new Date(y, m - 1, 1).toLocaleDateString("en-US", { year: "numeric", month: "short" });
+    return new Date(y, m - 1, day).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   }
 
   function el(tag, cls, text) {
@@ -115,9 +121,10 @@
 
   function render() {
     $("sort").value = state.sort;
+    $("expanded").checked = state.expanded;
     $("resetOrder").hidden = state.sort !== "mine";
 
-    const active = sortedIds().map((id) => byId.get(id)).filter((it) => !has(state.archived, it.id));
+    const active = activeItems();
     const shown = active.filter(matches);
 
     const frag = document.createDocumentFragment();
@@ -156,7 +163,7 @@
   }
 
   function updateStats(active) {
-    active = active || sortedIds().map((id) => byId.get(id)).filter((it) => !has(state.archived, it.id));
+    active = active || activeItems();
     const total = active.length;
     const done = active.filter((it) => isWatched(it.id)).length;
     $("hWatched").textContent = done;
@@ -245,6 +252,30 @@
     listEl.querySelectorAll(".over-top,.over-bottom").forEach((n) => n.classList.remove("over-top", "over-bottom"));
   }
 
+  // ---- jump to next unwatched ----
+  let jumpId = null;
+  function jumpNext() {
+    const rows = [...listEl.querySelectorAll(".item:not(.watched)")];
+    if (!rows.length) return;
+    // step forward only while the last target is still on screen; otherwise restart at the first
+    let start = 0;
+    const cur = jumpId && listEl.querySelector(`.item[data-id="${jumpId}"]`);
+    if (cur) {
+      const r = cur.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < innerHeight) {
+        const after = rows.findIndex((x) => cur.compareDocumentPosition(x) & Node.DOCUMENT_POSITION_FOLLOWING);
+        start = after === -1 ? 0 : after;
+      }
+    }
+    const target = rows[start];
+    jumpId = target.dataset.id;
+    target.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+    target.classList.remove("flash"); void target.offsetWidth; target.classList.add("flash");
+    target.addEventListener("animationend", () => target.classList.remove("flash"), { once: true });
+    $("live").textContent = byId.get(jumpId).title;
+  }
+  $("jump").addEventListener("click", jumpNext);
+
   // ---- controls ----
   document.querySelectorAll(".pill").forEach((p) =>
     p.addEventListener("click", () => {
@@ -254,6 +285,7 @@
     })
   );
   $("sort").addEventListener("change", (e) => { state.sort = e.target.value; save(); render(); });
+  $("expanded").addEventListener("change", (e) => { state.expanded = e.target.checked; save(); render(); });
   $("search").addEventListener("input", (e) => { query = e.target.value.trim().toLowerCase(); render(); });
   $("archiveToggle").addEventListener("click", (e) => {
     archEl.hidden = !archEl.hidden;
