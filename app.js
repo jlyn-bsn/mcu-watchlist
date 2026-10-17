@@ -78,8 +78,8 @@
     const grip = el(archived ? "span" : "button", "grip", "⋮⋮");
     if (!archived) {
       grip.type = "button";
-      grip.title = "Drag to reorder, or focus and use the arrow keys";
-      grip.setAttribute("aria-label", "Reorder " + it.title + ". Use the up and down arrow keys.");
+      grip.title = "Drag, or use the arrow keys";
+      grip.setAttribute("aria-label", "Reorder " + it.title + " with the arrow keys");
       grip.addEventListener("keydown", (e) => {
         if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
         e.preventDefault();
@@ -146,7 +146,7 @@
     if (firstRender) { firstRender = false; listEl.querySelectorAll(".item").forEach((r, i) => { if (i < 12) { r.classList.add("enter"); r.style.animationDelay = i * 40 + "ms"; } }); }
     const empty = $("empty");
     empty.hidden = shown.length > 0;
-    if (!shown.length) empty.textContent = typeFilter === "unwatched" && !query ? "You have watched everything on this list." : "No titles match your filters.";
+    if (!shown.length) empty.textContent = typeFilter === "unwatched" && !query ? "Everything watched." : "No matches.";
 
     const arch = state.archived.filter((id) => byId.has(id)).map((id) => byId.get(id));
     archEl.replaceChildren(...arch.map((it) => row(it, true)));

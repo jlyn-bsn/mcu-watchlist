@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MCU Watchlist</title>
-<meta name="description" content="Every MCU film and series in release order. Tick what you have watched, archive what you will skip, drag to make your own order.">
+<meta name="description" content="Every MCU film and series in order. Track, archive, reorder.">
 <meta property="og:title" content="MCU Watchlist">
-<meta property="og:description" content="Every MCU film and series in release order. Tick, archive, drag.">
+<meta property="og:description" content="Every MCU film and series in order.">
 <meta name="theme-color" content="#0b0b12">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%23e62429%27/%3E%3Ctext x=%2716%27 y=%2723%27 font-family=%27Arial,sans-serif%27 font-weight=%27700%27 font-size=%2720%27 text-anchor=%27middle%27 fill=%27white%27%3EM%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,7 +52,7 @@
         <span class="chip rec">Recommended</span>
         <span class="chip opt">Optional</span>
       </div>
-      <p class="hint">Essential means the main story runs through it. Recommended adds context or payoff worth having. Optional means you can skip it and still follow along. Tags like Fox, Sony SSU and Netflix mark titles from outside Marvel Studios.</p>
+      <p class="hint">Essential: the main story. Recommended: adds context. Optional: safe to skip. Fox, Sony SSU and Netflix tags mark titles from outside Marvel Studios.</p>
     </section>
 
     <div id="list" tabindex="-1"></div>
@@ -66,7 +66,7 @@
   </main>
 
   <footer class="foot">
-    <p>A fan-made tracker. Not affiliated with Marvel or Disney. Dates are US release dates, or premiere dates for series. Your progress is saved in this browser, so there is nothing to sign in to.</p>
+    <p>Fan-made. Not affiliated with Marvel or Disney. Dates are US releases or series premieres. Progress is saved in this browser.</p>
     <button class="link-btn" id="resetProgress" type="button">Reset watch progress</button>
   </footer>
 </div>
@@ -74,7 +74,7 @@
 <dialog id="confirm" aria-labelledby="confirmTitle">
   <form method="dialog">
     <h2 id="confirmTitle">Reset your order?</h2>
-    <p>This puts every title back in the original release order. Your watched and archived titles are kept.</p>
+    <p>Every title goes back to release order. Watched and archived titles are kept.</p>
     <div class="dlg-actions">
       <button value="cancel" class="dlg-btn" autofocus>Cancel</button>
       <button value="ok" class="dlg-btn danger" id="confirmOk">Reset order</button>
@@ -84,7 +84,7 @@
 <dialog id="confirmProgress" aria-labelledby="progressTitle">
   <form method="dialog">
     <h2 id="progressTitle">Reset watch progress?</h2>
-    <p>This marks every title as unwatched. Your archive and your custom order are kept. This cannot be undone.</p>
+    <p>Every title becomes unwatched. Archive and order are kept. This cannot be undone.</p>
     <div class="dlg-actions">
       <button value="cancel" class="dlg-btn" autofocus>Cancel</button>
       <button value="ok" class="dlg-btn danger">Reset progress</button>

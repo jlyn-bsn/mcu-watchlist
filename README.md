@@ -1,7 +1,7 @@
 # MCU Watchlist
 
-A single-list MCU watch tracker in plain HTML, CSS and JavaScript. No build step and no account:
-watched, archived and reordered titles are saved in the browser (localStorage).
+A single-list MCU watch tracker in plain HTML, CSS and JavaScript. No build, no account.
+Progress is saved in the browser (localStorage).
 
 ## Run locally
 
@@ -16,5 +16,5 @@ npx http-server -p 5173 .
 3. Link it: `firebase use --add` and pick the project (this writes `.firebaserc`).
 4. Deploy: `firebase deploy --only hosting`.
 
-`firebase.json` publishes this folder and leaves out dotfiles, the README and tooling folders.
-Progress is per browser and per device; clearing site data removes it.
+`firebase.json` publishes this folder, minus dotfiles, the README and tooling folders.
+Progress is per browser and device; clearing site data removes it.
