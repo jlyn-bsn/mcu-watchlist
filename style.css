@@ -193,14 +193,14 @@ dialog p { color: var(--muted); }
   .pill-btn { min-height: 46px; }
 }
 @media (max-width: 600px) {
-  .item { grid-template-columns: 1fr auto; column-gap: 10px; }
-  .grip { display: none; }
+  .item { grid-template-columns: auto 1fr auto; column-gap: 8px; padding-left: 6px; }
+  .grip { min-width: 36px; min-height: 44px; padding: 0; display: grid; place-items: center; }
   .tile { display: none; }
   .title::before { content: ""; display: inline-block; width: .5em; height: .5em; border-radius: 50%; background: var(--c); margin-right: .45em; vertical-align: .08em; }
-  .title-row { grid-column: 1 / -1; flex-wrap: nowrap; align-items: baseline; gap: 4px 8px; }
+  .title-row { grid-column: 2 / -1; flex-wrap: nowrap; align-items: baseline; gap: 4px 8px; }
   .title-row .chip { flex: none; }
-  .meta { grid-column: 1; }
-  .actions { grid-column: 2; }
+  .meta { grid-column: 2; }
+  .actions { grid-column: 3; }
 }
 @media (prefers-reduced-motion: reduce) {
   .item.enter { animation: none; }
