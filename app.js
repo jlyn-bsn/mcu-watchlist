@@ -258,7 +258,8 @@
     }
     function swap(sib, after) {
       const before = sib.getBoundingClientRect().top;
-      ol.insertBefore(li, after ? sib.nextSibling : sib);
+      // move the neighbour, never the dragged row: re-parenting the grip would drop pointer capture
+      ol.insertBefore(sib, after ? li : li.nextSibling);
       moved = true;
       if (reduceMotion()) return;
       const d = before - sib.getBoundingClientRect().top;
